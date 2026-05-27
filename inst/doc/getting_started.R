@@ -1,0 +1,60 @@
+## ----include = FALSE----------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  output.lines = 10
+)
+has_duckdb <- requireNamespace("duckdb", quietly = TRUE)
+knitr::opts_chunk$set(eval = has_duckdb)
+
+## ----setup--------------------------------------------------------------------
+library(dbSpatial)
+
+## -----------------------------------------------------------------------------
+# create db connection in memory
+duckdb_conn = DBI::dbConnect(duckdb::duckdb(), ":memory:")
+DBI::dbExecute(duckdb_conn, "SET threads = 1")
+
+## -----------------------------------------------------------------------------
+# test data
+test_data = data.frame(x = 1:10, y = 1:10, id = 1:10)
+
+# df, tbl
+# specify x and y column names to cast to a point geometry
+a <- dbSpatial(conn = duckdb_conn,
+               name = "test_points",
+               value = test_data,
+               x_colName = "x",
+               y_colName = "y",
+               overwrite = TRUE)
+a
+
+## -----------------------------------------------------------------------------
+# test data
+test_data = data.frame(x = 1:10, y = 1:10, id = 1:10)
+
+# write to file
+write.csv(test_data, "test_data.csv", row.names = FALSE)
+
+# load file in db
+a <- dbSpatial(conn = duckdb_conn,
+               name = "test_points",
+               value = 'test_data.csv',
+               x_colName = "x",
+               y_colName = "y",
+               overwrite = TRUE)
+a
+
+## -----------------------------------------------------------------------------
+# load terra package
+library(terra)
+
+# Create a SpatVector from the data.frame
+dummy_spatvector <- terra::vect(test_data, geom = c("x", "y"))
+
+# Load SpatVector in db
+dbSpatial(conn = duckdb_conn,
+          name = "spatVector_proxy",
+          value = dummy_spatvector,
+          overwrite = TRUE)
+

@@ -1,0 +1,78 @@
+---
+title: "Spatial Operations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Spatial Operations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+has_duckdb <- requireNamespace("duckdb", quietly = TRUE)
+knitr::opts_chunk$set(eval = has_duckdb)
+```
+
+```{r setup}
+library(dbSpatial)
+library(sf)
+library(dplyr)
+```
+
+## Setup
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
+DBI::dbExecute(con, "SET threads = 1")
+
+# Sample points
+df <- data.frame(id = 1:3, x = c(0, 10, 20), y = c(0, 10, 20))
+pts <- dbSpatial(
+  conn = con, name = "pts", value = df,
+  x_colName = "x", y_colName = "y", overwrite = TRUE
+)
+pts
+```
+
+## Geometry Operations
+
+```{r}
+# Buffer
+st_buffer(pts, dist = 5)
+
+# Centroid
+st_centroid(pts)
+
+# Simplify
+st_simplify(pts, dTolerance = 1)
+```
+
+## Measurements
+
+```{r}
+# Bounding box
+st_bbox(pts)
+
+# Check validity
+st_is_valid(pts)
+```
+
+## Spatial Joins
+
+Use `st_join()` to perform spatial joins with various predicates:
+
+```{r}
+# Self-join using intersection predicate (returns joined table)
+st_join(pts, pts, join = st_intersects)
+```
+
+## Convert to sf
+
+```{r}
+sf_pts <- st_as_sf(pts)
+sf_pts
+```
+
+```{r cleanup, include=FALSE}
+DBI::dbDisconnect(con, shutdown = TRUE)
+```
