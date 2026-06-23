@@ -1,3 +1,20 @@
+skip_on_cran()
+
+test_that("loadSpatial uses a temporary extension directory by default", {
+  skip_if_not_installed("duckdb")
+
+  con <- DBI::dbConnect(duckdb::duckdb())
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  suppressMessages(loadSpatial(con))
+
+  extension_files <- list.files(
+    file.path(tempdir(), "dbSpatial-duckdb-extensions"),
+    recursive = TRUE
+  )
+  expect_true(any(grepl("spatial\\.duckdb_extension$", extension_files)))
+})
+
 test_that("dbSpatial constructor works", {
   skip_if_not_installed("duckdb")
 
@@ -16,6 +33,38 @@ test_that("dbSpatial constructor works", {
 
   expect_s4_class(pts, "dbSpatial")
   expect_true("geom" %in% colnames(pts[]))
+})
+
+test_that("as_dbSpatial can create persistent tables", {
+  skip_if_not_installed("duckdb")
+  skip_if_not_installed("sf")
+
+  db_path <- tempfile(fileext = ".duckdb")
+  con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path)
+  on.exit({
+    if (DBI::dbIsValid(con)) {
+      DBI::dbDisconnect(con, shutdown = TRUE)
+    }
+  }, add = TRUE)
+  on.exit(unlink(db_path), add = TRUE)
+
+  point_sf <- sf::st_sf(
+    id = 1,
+    geometry = sf::st_sfc(sf::st_point(c(0, 1)))
+  )
+
+  as_dbSpatial(
+    point_sf,
+    conn = con,
+    name = "persisted_points",
+    overwrite = TRUE,
+    temporary = FALSE
+  )
+  DBI::dbDisconnect(con, shutdown = TRUE)
+
+  con2 <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path)
+  on.exit(DBI::dbDisconnect(con2, shutdown = TRUE), add = TRUE)
+  expect_true(DBI::dbExistsTable(con2, "persisted_points"))
 })
 
 test_that("basic spatial functions work", {
