@@ -343,50 +343,122 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dbSpatial)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt; Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.4.0; sf_use_s2() is TRUE</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;dplyr&#39;</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:terra&#39;:</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt;     intersect, union</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:base&#39;:</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>con <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>(), <span class="st">&quot;:memory:&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>DBI<span class="sc">::</span><span class="fu">dbExecute</span>(con, <span class="st">&quot;SET threads = 1&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Sample points</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">dbSpatial</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">conn =</span> con, <span class="at">name =</span> <span class="st">&quot;pts&quot;</span>, <span class="at">value =</span> df,</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">x_colName =</span> <span class="st">&quot;x&quot;</span>, <span class="at">y_colName =</span> <span class="st">&quot;y&quot;</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>pts</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Sample points</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">dbSpatial</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">conn =</span> con, <span class="at">name =</span> <span class="st">&quot;pts&quot;</span>, <span class="at">value =</span> df,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">x_colName =</span> <span class="st">&quot;x&quot;</span>, <span class="at">y_colName =</span> <span class="st">&quot;y&quot;</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>pts</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom         </span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 POINT (0 0)  </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 POINT (10 10)</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 POINT (20 20)</span></span></code></pre></div>
 </div>
 <div id="geometry-operations" class="section level2">
 <h2>Geometry Operations</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Buffer</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">st_buffer</span>(pts, <span class="at">dist =</span> <span class="dv">5</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Centroid</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">st_centroid</span>(pts)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Simplify</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">st_simplify</span>(pts, <span class="at">dTolerance =</span> <span class="dv">1</span>)</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom                             </span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                            </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 POLYGON ((5 0, 4.9931476737728...</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 POLYGON ((15 10, 14.9931476737...</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 POLYGON ((25 20, 24.9931476737...</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Centroid</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">st_centroid</span>(pts)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom         </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 POINT (0 0)  </span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 POINT (10 10)</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 POINT (20 20)</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co"># Simplify</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="fu">st_simplify</span>(pts, <span class="at">dTolerance =</span> <span class="dv">1</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom         </span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        </span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 POINT (0 0)  </span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 POINT (10 10)</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 POINT (20 20)</span></span></code></pre></div>
 </div>
 <div id="measurements" class="section level2">
 <h2>Measurements</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Bounding box</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">st_bbox</span>(pts)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Check validity</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">st_is_valid</span>(pts)</span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; xmin ymin xmax ymax </span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;    0    0   20   20</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co"># Check validity</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">st_is_valid</span>(pts)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 TRUE </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 TRUE </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 TRUE</span></span></code></pre></div>
 </div>
 <div id="spatial-joins" class="section level2">
 <h2>Spatial Joins</h2>
 <p>Use <code>st_join()</code> to perform spatial joins with various
 predicates:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Self-join using intersection predicate (returns joined table)</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">st_join</span>(pts, pts, <span class="at">join =</span> st_intersects)</span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">st_join</span>(pts, pts, <span class="at">join =</span> st_intersects)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 8]</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;      id     x     y geom           id_1   x_1   y_1 geom_1    </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;         &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;list&gt;    </span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 1     1     0     0 POINT (0 0)       1     0     0 &lt;raw [21]&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 2     2    10    10 POINT (10 10)     2    10    10 &lt;raw [21]&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 3     3    20    20 POINT (20 20)     3    20    20 &lt;raw [21]&gt;</span></span></code></pre></div>
 </div>
 <div id="convert-to-sf" class="section level2">
 <h2>Convert to sf</h2>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sf_pts <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(pts)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>sf_pts</span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>sf_pts</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; Simple feature collection with 3 features and 3 fields</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; Geometry type: POINT</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Dimension:     XY</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 20 ymax: 20</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; CRS:           NA</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;   id  x  y          geom</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; 1  1  0  0   POINT (0 0)</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; 2  2 10 10 POINT (10 10)</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; 3  3 20 20 POINT (20 20)</span></span></code></pre></div>
 </div>
 
 

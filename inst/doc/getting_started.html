@@ -348,13 +348,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 package to create a DuckDB database with spatial points and polygons
 starting from various data sources.</p>
 <p>All code chunks below are evaluated only when the <code>duckdb</code>
-package is available in the check environment.</p>
+package is available and <code>NOT_CRAN</code> is <code>&quot;true&quot;</code>,
+so they are skipped on CRAN.</p>
 </div>
 <div id="creating-a-duckdb-connection" class="section level2">
 <h2>Creating a DuckDB connection</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># create db connection in memory</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>duckdb_conn <span class="ot">=</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>(), <span class="st">&quot;:memory:&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>DBI<span class="sc">::</span><span class="fu">dbExecute</span>(duckdb_conn, <span class="st">&quot;SET threads = 1&quot;</span>)</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>DBI<span class="sc">::</span><span class="fu">dbExecute</span>(duckdb_conn, <span class="st">&quot;SET threads = 1&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 </div>
 <div id="reading-in-spatial-data-from-various-sources" class="section level2">
 <h2>Reading in spatial data from various sources</h2>
@@ -371,7 +373,22 @@ package is available in the check environment.</p>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>               <span class="at">x_colName =</span> <span class="st">&quot;x&quot;</span>,</span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>               <span class="at">y_colName =</span> <span class="st">&quot;y&quot;</span>,</span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>               <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>a</span></code></pre></div>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>a</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt;        x     y    id geom         </span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;        </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;  1     1     1     1 POINT (1 1)  </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt;  2     2     2     2 POINT (2 2)  </span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;  3     3     3     3 POINT (3 3)  </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;  4     4     4     4 POINT (4 4)  </span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;  5     5     5     5 POINT (5 5)  </span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;  6     6     6     6 POINT (6 6)  </span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt;  7     7     7     7 POINT (7 7)  </span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;  8     8     8     8 POINT (8 8)  </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;  9     9     9     9 POINT (9 9)  </span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; 10    10    10    10 POINT (10 10)</span></span></code></pre></div>
 </div>
 <div id="from-.csv-file" class="section level3">
 <h3>From .csv file</h3>
@@ -389,21 +406,52 @@ package is available in the check environment.</p>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>               <span class="at">x_colName =</span> <span class="st">&quot;x&quot;</span>,</span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>               <span class="at">y_colName =</span> <span class="st">&quot;y&quot;</span>,</span>
 <span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>               <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>a</span></code></pre></div>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>a</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 5]</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;    OGC_FID x     y     id    geom         </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;      &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;        </span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;  1       1 1     1     1     POINT (1 1)  </span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;  2       2 2     2     2     POINT (2 2)  </span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;  3       3 3     3     3     POINT (3 3)  </span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;  4       4 4     4     4     POINT (4 4)  </span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;  5       5 5     5     5     POINT (5 5)  </span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;  6       6 6     6     6     POINT (6 6)  </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;  7       7 7     7     7     POINT (7 7)  </span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;  8       8 8     8     8     POINT (8 8)  </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;  9       9 9     9     9     POINT (9 9)  </span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; 10      10 10    10    10    POINT (10 10)</span></span></code></pre></div>
 </div>
 <div id="from-terra-objects-spatvector" class="section level3">
 <h3>From {terra} objects: SpatVector</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># load terra package</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Create a SpatVector from the data.frame</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>dummy_spatvector <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(test_data, <span class="at">geom =</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>))</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Load SpatVector in db</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">dbSpatial</span>(<span class="at">conn =</span> duckdb_conn,</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>          <span class="at">name =</span> <span class="st">&quot;spatVector_proxy&quot;</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>          <span class="at">value =</span> dummy_spatvector,</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>          <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; terra 1.9.11</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># Create a SpatVector from the data.frame</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>dummy_spatvector <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">vect</span>(test_data, <span class="at">geom =</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co"># Load SpatVector in db</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="fu">dbSpatial</span>(<span class="at">conn =</span> duckdb_conn,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>          <span class="at">name =</span> <span class="st">&quot;spatVector_proxy&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>          <span class="at">value =</span> dummy_spatvector,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>          <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; # Class:    dbSpatial </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; # Source:   SQL [?? x 2]</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; # Database: DuckDB 1.5.2 [unknown@Linux 6.6.87.2-microsoft-standard-WSL2:R 4.6.0/:memory:]</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt;       id geom         </span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;        </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt;  1     1 POINT (1 1)  </span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;  2     2 POINT (2 2)  </span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt;  3     3 POINT (3 3)  </span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt;  4     4 POINT (4 4)  </span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt;  5     5 POINT (5 5)  </span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt;  6     6 POINT (6 6)  </span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt;  7     7 POINT (7 7)  </span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt;  8     8 POINT (8 8)  </span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt;  9     9 POINT (9 9)  </span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; 10    10 POINT (10 10)</span></span></code></pre></div>
 </div>
 </div>
 
