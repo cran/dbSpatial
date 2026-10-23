@@ -1,10 +1,10 @@
-7635d13b212405360e6f483e5fab8982 *DESCRIPTION
+b7677e99124f53111faffcb049f3c78e *DESCRIPTION
 1ebbd3e34237af26da5dc08a4e440464 *GPL-3
 9c54981d3cdd5007d7db02378941f147 *LICENSE
 d54386151082dd47bcf16a11fc4e9b26 *NAMESPACE
-c78938110350df0b81dc67b022ae6f58 *NEWS.md
+e506874c09b894c5de3b8834a934b827 *NEWS.md
 8a848bd9452a9a54dd57cb4461e528b8 *R/accessors.R
-18d9d7507625d06a603a9db427fd120d *R/as_dbSpatial.R
+98ca28afc1bedb6d2d5165c1a968858d *R/as_dbSpatial.R
 9bdcb94a6897ef74ba657f7221f6f329 *R/classes.R
 6d61f4329ddf866fef0e7cad6f828f26 *R/coerce.R
 203faa98fab85844da481bc880f067d4 *R/constructors.R
@@ -25,7 +25,7 @@ e25f9094a614bfadefd31f52c772e209 *R/sql_gen.R
 01e6fa992e8f54040f77fa6a28e783b5 *R/st_geometry_type.R
 16b7f66a5b7d79dd6c26bfa06c8b4dfe *R/st_geometrytype.R
 7bb662c6831ef3a3eec847f4f5103133 *R/st_is_valid.R
-0bc1279dcb5278aec7d663557da7666a *R/st_join.R
+ec12c399011fec783dda5b875b68905a *R/st_join.R
 51c8f1714f59d3d923614c3e3840b430 *R/st_read.R
 a3adc67f9a464d20f55cb593b9a2954b *R/st_spatial_join.R
 e4cdfebabb86960d5614a16d7e4dbec4 *R/st_translate.R
@@ -76,7 +76,7 @@ bc560e4e7adee51635a2128c52469368 *man/st_ymax.Rd
 f49e872867d5a20f0f5ce538339492c9 *man/vect-dbSpatial-method.Rd
 2e85afe6280f8aefcc962630d8c5058f *tests/testthat.R
 d9b5fcacd5817124c07d6c8baa7294f7 *tests/testthat/test-extract.R
-cb53ef86ef8f7351157a97a7568c0704 *tests/testthat/test-spatial-functions.R
+4d43c67e1916f590c4a5b5c5bc333c39 *tests/testthat/test-spatial-functions.R
 225f226bfe350e71a7f813932797e498 *vignettes/class_structure.Rmd
 7fae144bfd45f0d460ac3247bcbcd46a *vignettes/class_structure.md
 cf4477301e1f0d685c414681fc391bc9 *vignettes/getting_started.Rmd
